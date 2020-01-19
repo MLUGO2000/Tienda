@@ -1,12 +1,9 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.recyclerview.extensions.ListAdapter;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +19,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.producto;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class adapterProductoTodos extends RecyclerView.Adapter<adapterProductoTodos.MyAdapterProducto> implements Filterable {
 

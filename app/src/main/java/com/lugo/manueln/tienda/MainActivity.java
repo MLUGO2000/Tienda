@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity
             fragmentSelect=true;
 
         } else if (id == R.id.nav_cat) {
+            miFragment=new categoriasFragment();
+            fragmentSelect=true;
 
         } else if (id == R.id.nav_promo) {
 

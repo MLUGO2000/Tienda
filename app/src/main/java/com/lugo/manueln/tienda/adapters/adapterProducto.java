@@ -1,6 +1,5 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -20,6 +19,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.infoProducto;
+import com.lugo.manueln.tienda.producto;
 
 import java.util.List;
 

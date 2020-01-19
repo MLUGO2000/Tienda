@@ -4,9 +4,25 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.adapters.adapterCategorias;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 /**
@@ -64,7 +80,63 @@ public class categoriasFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_categorias, container, false);
+        View vista= inflater.inflate(R.layout.fragment_categorias, container, false);
+
+        requestQueue=Volley.newRequestQueue(getContext());
+
+        miRecylcerCategorias=vista.findViewById(R.id.recyclerCatNombres);
+
+        LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
+
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        miRecylcerCategorias.setLayoutManager(layoutManager);
+
+        cargarNombresCategoria();
+
+
+
+        return vista;
+    }
+
+    private void cargarNombresCategoria() {
+
+        nombresCategorias=new ArrayList<>();
+
+        String ip=getString(R.string.ip);
+
+        String url=ip + "/WebTienda/wsJSONConsultarCategorias.php";
+
+
+        objectRequest =new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                JSONArray miArrayObject=response.optJSONArray("categorias");
+
+                for(int i=0;i<miArrayObject.length();i++){
+                    JSONObject jsonObject=miArrayObject.optJSONObject(i);
+
+                    nombresCategorias.add(jsonObject.optString("nombre"));
+
+                }
+
+                adapterCategorias miAdapteCat=new adapterCategorias(getContext(),nombresCategorias);
+                miRecylcerCategorias.setAdapter(miAdapteCat);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getContext(), "Error de Tipo" + error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        requestQueue.add(objectRequest);
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -105,4 +177,9 @@ public class categoriasFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    RecyclerView miRecylcerCategorias;
+    ArrayList<String> nombresCategorias;
+    JsonObjectRequest objectRequest;
+    RequestQueue requestQueue;
 }

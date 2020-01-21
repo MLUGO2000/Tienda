@@ -6,9 +6,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -17,23 +21,24 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.lugo.manueln.tienda.adapters.adapterCategorias;
+import com.lugo.manueln.tienda.adapters.adapterProductoTodos;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.AbstractQueue;
 import java.util.ArrayList;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link categoriasFragment.OnFragmentInteractionListener} interface
+ * {@link categoriaSeleccionada.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link categoriasFragment#newInstance} factory method to
+ * Use the {@link categoriaSeleccionada#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class categoriasFragment extends Fragment {
+public class categoriaSeleccionada extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -45,7 +50,8 @@ public class categoriasFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public categoriasFragment() {
+
+    public categoriaSeleccionada() {
         // Required empty public constructor
     }
 
@@ -55,11 +61,11 @@ public class categoriasFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment categoriasFragment.
+     * @return A new instance of fragment categoriaSeleccionada.
      */
     // TODO: Rename and change types and number of parameters
-    public static categoriasFragment newInstance(String param1, String param2) {
-        categoriasFragment fragment = new categoriasFragment();
+    public static categoriaSeleccionada newInstance(String param1, String param2) {
+        categoriaSeleccionada fragment = new categoriaSeleccionada();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -80,63 +86,101 @@ public class categoriasFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View vista= inflater.inflate(R.layout.fragment_categorias, container, false);
+        View vista= inflater.inflate(R.layout.fragment_categoria_seleccionada, container, false);
 
-        requestQueue=Volley.newRequestQueue(getContext());
+        buscarCategoria=vista.findViewById(R.id.editBuscadorCategoria);
 
-        miRecylcerCategorias=vista.findViewById(R.id.recyclerCatNombres);
+        miRecyclerSelec=vista.findViewById(R.id.buscarCategoriaRecycler);
 
-        LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
+        LinearLayoutManager miManager=new LinearLayoutManager(getContext());
+        miManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        miRecyclerSelec.setLayoutManager(miManager);
 
-        miRecylcerCategorias.setLayoutManager(layoutManager);
+        colaPeticiones=Volley.newRequestQueue(getContext());
 
-        cargarNombresCategoria();
+        Bundle bundle=getArguments();
 
+        String categoria=bundle.getString("categoria");
 
-
+        cargarDatosProductosCategoria(categoria);
         return vista;
     }
 
-    private void cargarNombresCategoria() {
 
-        nombresCategorias=new ArrayList<>();
+    private void cargarDatosProductosCategoria(String categoriaSelec) {
 
         String ip=getString(R.string.ip);
 
-        String url=ip + "/WebTienda/wsJSONConsultarCategorias.php";
+        String url=ip + "/WebTienda/wsJSONConsultarProductosCategoria.php?categoria=" + categoriaSelec;
 
-
-        objectRequest =new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        objectRequest=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
-                JSONArray miArrayObject=response.optJSONArray("categorias");
+                ArrayList<producto> miListaProductos = new ArrayList<producto>();
+                producto miProducto = null;
 
-                for(int i=0;i<miArrayObject.length();i++){
-                    JSONObject jsonObject=miArrayObject.optJSONObject(i);
+                JSONArray jsonArray = response.optJSONArray("producto");
 
-                    nombresCategorias.add(jsonObject.optString("nombre"));
+                try {
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        miProducto = new producto();
+
+                        JSONObject object = jsonArray.optJSONObject(i);
+
+                        miProducto.setIdP(object.optInt("id"));
+                        miProducto.setNombreP(object.optString("nombre"));
+                        miProducto.setCategoriaP(object.optString("categoria"));
+                        miProducto.setPrecioP(object.optInt("precio"));
+                        miProducto.setRutaImagenP(object.optString("ruta"));
+
+                        miListaProductos.add(miProducto);
+
+                    }
+
+                    final adapterProductoTodos miAdapter=new adapterProductoTodos(getContext(),miListaProductos,getActivity());
+
+                    miRecyclerSelec.setAdapter(miAdapter);
+
+                    buscarCategoria.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                            miAdapter.getFilter().filter(charSequence.toString());
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+
+                        }
+                    });
+
+                } catch (Exception ejson) {
+
+                    ejson.printStackTrace();
+                    Toast.makeText(getContext(), "No se ha podido establecer conexion con el servidor" +
+                            " " + response, Toast.LENGTH_LONG).show();
 
                 }
-
-                adapterCategorias miAdapteCat=new adapterCategorias(getContext(),nombresCategorias,getActivity());
-                miRecylcerCategorias.setAdapter(miAdapteCat);
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getContext(), "Error de Tipo" + error.toString(), Toast.LENGTH_SHORT).show();
+                Log.e("Error Web","Error Volley de Tipo :"  + error);
             }
         });
 
 
-        requestQueue.add(objectRequest);
-
-
+        colaPeticiones.add(objectRequest);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -178,8 +222,10 @@ public class categoriasFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    RecyclerView miRecylcerCategorias;
-    ArrayList<String> nombresCategorias;
-    JsonObjectRequest objectRequest;
-    RequestQueue requestQueue;
+
+    private RecyclerView miRecyclerSelec;
+    private EditText buscarCategoria;
+
+    private JsonObjectRequest objectRequest;
+    private RequestQueue colaPeticiones;
 }

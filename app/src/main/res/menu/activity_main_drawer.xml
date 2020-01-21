@@ -19,7 +19,7 @@
             android:title="Promociones" />
         <item
             android:id="@+id/nav_buscar"
-            android:icon="@drawable/ic_menu_share"
+            android:icon="@android:drawable/ic_menu_search"
             android:title="Buscar" />
         <item
             android:id="@+id/nav_ubi"

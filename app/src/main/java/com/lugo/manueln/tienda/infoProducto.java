@@ -1,6 +1,10 @@
 package com.lugo.manueln.tienda;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +12,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,7 +37,7 @@ import org.json.JSONObject;
  * Use the {@link infoProducto#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class infoProducto extends Fragment {
+public class infoProducto extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "idProducto";
@@ -86,6 +92,10 @@ public class infoProducto extends Fragment {
         txtvNombre=vista.findViewById(R.id.txtNombreInfo);
         txtvCategoria=vista.findViewById(R.id.txtCategoriaInfo);
         txtvPrecio=vista.findViewById(R.id.txtPrecioInfo);
+        bAgregar=vista.findViewById(R.id.buttonAgregar);
+        editTextCantidad=vista.findViewById(R.id.editCantidad);
+
+        bAgregar.setOnClickListener(this);
 
         int id=mParamId;
 
@@ -106,11 +116,20 @@ public class infoProducto extends Fragment {
 
                 JSONObject object=jsonArray.optJSONObject(0);
 
-                txtvNombre.setText(object.optString("nombre"));
-                txtvCategoria.setText(object.optString("categoria"));
-                txtvPrecio.setText(object.optInt("precio")+"$");
+                miProducto=new producto();
 
-                cargarImagen(object.optString("ruta"));
+                miProducto.setIdP(object.optInt("id"));
+                miProducto.setNombreP(object.optString("nombre"));
+                miProducto.setDescripcionP(object.optString("descripcion"));
+                miProducto.setCategoriaP(object.optString("categoria"));
+                miProducto.setPrecioP(object.optInt("precio"));
+                miProducto.setRutaImagenP(object.optString("ruta"));
+
+                txtvNombre.setText(miProducto.getNombreP());
+                txtvCategoria.setText(miProducto.getCategoriaP());
+                txtvPrecio.setText(miProducto.getPrecioP()+"$");
+
+                cargarImagen(miProducto.getRutaImagenP());
 
 
             }
@@ -171,6 +190,36 @@ public class infoProducto extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onClick(View view) {
+
+        agregarProductoCarrito();
+    }
+
+    private void agregarProductoCarrito() {
+
+        ConexBBDDHelper  miConex=new ConexBBDDHelper(getContext(),"ordenes",null,1);
+
+        SQLiteDatabase miBBDD=miConex.getWritableDatabase();
+
+        ContentValues valores=new ContentValues();
+
+         valores.put(utilidadesBD.CAMPO_ID,miProducto.getIdP());
+         valores.put(utilidadesBD.CAMPO_NOMBRE,miProducto.getNombreP());
+         valores.put(utilidadesBD.CAMPO_PRECIO,miProducto.getPrecioP());
+         valores.put(utilidadesBD.CAMPO_URL,miProducto.getRutaImagenP());
+         valores.put(utilidadesBD.CAMPO_CANTIDAD,Integer.parseInt(editTextCantidad.getText().toString()));
+
+         miBBDD.insert(utilidadesBD.TABLA_ORDENES,null,valores);
+
+         miBBDD.close();
+         miConex.close();
+
+
+
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -190,4 +239,7 @@ public class infoProducto extends Fragment {
     RequestQueue colaRequest;
     ImageView imagenProducto;
     TextView txtvNombre,txtvCategoria,txtvPrecio;
+    EditText editTextCantidad;
+    Button bAgregar;
+    producto miProducto;
 }

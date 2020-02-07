@@ -16,7 +16,7 @@
         <item
             android:id="@+id/nav_promo"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Promociones" />
+            android:title="Carrito" />
         <item
             android:id="@+id/nav_buscar"
             android:icon="@android:drawable/ic_menu_search"

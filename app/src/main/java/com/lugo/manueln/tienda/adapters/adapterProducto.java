@@ -34,6 +34,7 @@ public class adapterProducto extends RecyclerView.Adapter<adapterProducto.MyAdap
     FragmentActivity miActividad;
     public adapterProducto(Context contexto, List<producto> lista, FragmentActivity actividad){
 
+
         miActividad=actividad;
         context=contexto;
         miListProducto=lista;

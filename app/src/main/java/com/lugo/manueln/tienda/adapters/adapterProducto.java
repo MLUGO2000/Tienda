@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ public class adapterProducto extends RecyclerView.Adapter<adapterProducto.MyAdap
     List<producto> miListProducto;
     Context context;
     RequestQueue queue;
+    FragmentActivity fragmentActivity;
 
     FragmentActivity miActividad;
     public adapterProducto(Context contexto, List<producto> lista, FragmentActivity actividad){
@@ -71,8 +73,10 @@ public class adapterProducto extends RecyclerView.Adapter<adapterProducto.MyAdap
 
                 miProducto.setArguments(infoBundle);
 
-                miActividad.getSupportFragmentManager().beginTransaction().replace(R.id.frameAuxiliar,miProducto).addToBackStack(null).commit();
+                FragmentTransaction miTransaction=miActividad.getSupportFragmentManager().beginTransaction();
 
+
+                miTransaction.replace(R.id.frameAuxiliar,miProducto).commit();
 
 
 

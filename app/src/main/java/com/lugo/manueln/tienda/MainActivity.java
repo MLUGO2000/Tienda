@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,interFragments {
@@ -36,8 +37,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Fragment miFragment=this.getSupportFragmentManager().findFragmentById(R.id.frameAuxiliar);
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        }else if(miFragment!=null){
+
+            if(miFragment.isVisible()) {
+                getSupportFragmentManager().beginTransaction().remove(miFragment).commit();
+            }else {
+                super.onBackPressed();
+            }
         } else {
             super.onBackPressed();
         }
@@ -93,6 +103,14 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_ubi) {
 
+        }
+
+        Fragment fragmentAux=this.getSupportFragmentManager().findFragmentById(R.id.frameAuxiliar);
+
+        if(fragmentAux!=null){
+            if(fragmentAux.isVisible()){
+                getSupportFragmentManager().beginTransaction().remove(fragmentAux).commit();
+            }
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.framePrincipal,miFragment).addToBackStack(null).commit();

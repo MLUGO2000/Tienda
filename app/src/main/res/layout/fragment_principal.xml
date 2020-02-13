@@ -147,7 +147,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+            app:layout_constraintTop_toBottomOf="@+id/cardView2" >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerCarritoPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" />
+        </android.support.v7.widget.CardView>
     </android.support.constraint.ConstraintLayout>
 
 

@@ -3,6 +3,7 @@ package com.lugo.manueln.tienda;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -198,25 +200,80 @@ public class infoProducto extends Fragment implements View.OnClickListener {
 
     private void agregarProductoCarrito() {
 
-        ConexBBDDHelper  miConex=new ConexBBDDHelper(getContext(),"ordenes",null,1);
+        ConexBBDDHelper miConex = new ConexBBDDHelper(getContext(), "ordenes", null, 1);
 
-        SQLiteDatabase miBBDD=miConex.getWritableDatabase();
+        SQLiteDatabase miBBDD = miConex.getWritableDatabase();
 
-        ContentValues valores=new ContentValues();
+        orden miOrden=verificarOrdenExistente(miProducto.getIdP());
 
-         valores.put(utilidadesBD.CAMPO_ID,miProducto.getIdP());
-         valores.put(utilidadesBD.CAMPO_NOMBRE,miProducto.getNombreP());
-         valores.put(utilidadesBD.CAMPO_PRECIO,miProducto.getPrecioP());
-         valores.put(utilidadesBD.CAMPO_URL,miProducto.getRutaImagenP());
-         valores.put(utilidadesBD.CAMPO_CANTIDAD,Integer.parseInt(editTextCantidad.getText().toString()));
+        if(!miOrden.isOrdenExistente()) {
 
-         miBBDD.insert(utilidadesBD.TABLA_ORDENES,null,valores);
+            ContentValues valores = new ContentValues();
 
-         miBBDD.close();
-         miConex.close();
+            valores.put(utilidadesBD.CAMPO_ID, miProducto.getIdP());
+            valores.put(utilidadesBD.CAMPO_NOMBRE, miProducto.getNombreP());
+            valores.put(utilidadesBD.CAMPO_PRECIO, miProducto.getPrecioP());
+            valores.put(utilidadesBD.CAMPO_URL, miProducto.getRutaImagenP());
+            valores.put(utilidadesBD.CAMPO_CANTIDAD, Integer.parseInt(editTextCantidad.getText().toString()));
+
+            miBBDD.insert(utilidadesBD.TABLA_ORDENES, null, valores);
+
+        }else {
+            ContentValues valores=new ContentValues();
+
+            double precioTotalNuevo=miOrden.getPrecioTotalOrden()+(miProducto.getPrecioP()*Integer.parseInt(editTextCantidad.getText().toString()));
+            int cantidadTotalNueva=miOrden.getCantidadOrden() + (Integer.parseInt(editTextCantidad.getText().toString()));
+
+
+            valores.put(utilidadesBD.CAMPO_TOTAL,precioTotalNuevo);
+            valores.put(utilidadesBD.CAMPO_CANTIDAD,cantidadTotalNueva);
+
+            int result=miBBDD.update(utilidadesBD.TABLA_ORDENES,valores,"id = ?" ,new String[]{""+miProducto.getIdP()});
+
+        }
+
+        miBBDD.close();
+        miConex.close();
+
+        Toast.makeText(getContext(), "Agregado", Toast.LENGTH_SHORT).show();
 
 
 
+
+    }
+
+    private orden verificarOrdenExistente(int id) {
+
+        orden ordenEdicion=new orden();
+
+        ordenEdicion.setOrdenExistente(true);
+
+        ConexBBDDHelper miConex= new ConexBBDDHelper(getContext(),"ordenes",null,1);
+
+        SQLiteDatabase db = miConex.getReadableDatabase();
+
+        Cursor miCursor=db.rawQuery("SELECT * FROM " + utilidadesBD.TABLA_ORDENES + " WHERE " +utilidadesBD.CAMPO_ID +  "= ?",new String[]{""+id});
+
+
+        if(miCursor.moveToNext()){
+            //Toast.makeText(getContext(), "Se Encontro un Registro con el mismo id", Toast.LENGTH_SHORT).show();
+
+            int cantidadTotalActual=miCursor.getInt(4);
+
+            double precioTotalActual=miCursor.getDouble(5);
+
+            ordenEdicion.setPrecioTotalOrden(precioTotalActual);
+            ordenEdicion.setCantidadOrden(cantidadTotalActual);
+            ordenEdicion.setOrdenExistente(true);
+        }else {
+            //Toast.makeText(getContext(), "No hay ningun Registro con esa id", Toast.LENGTH_SHORT).show();
+
+            ordenEdicion.setOrdenExistente(false);
+        }
+        miConex.close();
+        db.close();
+
+        return ordenEdicion;
 
     }
 

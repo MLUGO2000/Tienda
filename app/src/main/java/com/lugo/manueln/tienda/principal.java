@@ -1,6 +1,8 @@
 package com.lugo.manueln.tienda;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +21,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.adapters.adapterCarritoPrincipal;
 import com.lugo.manueln.tienda.adapters.adapterProducto;
 
 import org.json.JSONArray;
@@ -89,6 +92,12 @@ public class principal extends Fragment  {
         // Inflate the layout for this fragment
         View vista= inflater.inflate(R.layout.fragment_principal, container, false);
 
+        miRecyclerCarrito=vista.findViewById(R.id.recyclerCarritoPrincipal);
+
+        LinearLayoutManager managerCarrito=new LinearLayoutManager(getContext());
+        managerCarrito.setOrientation(LinearLayoutManager.HORIZONTAL);
+        miRecyclerCarrito.setLayoutManager(managerCarrito);
+
         listaProductos=new ArrayList<>();
 
         requestQueue=Volley.newRequestQueue(getContext());
@@ -150,7 +159,7 @@ public class principal extends Fragment  {
         cargarWebServiceUrl("Licores");
 
 
-
+        cargarCarritoPrincipal();
 
 
 
@@ -169,6 +178,37 @@ public class principal extends Fragment  {
         return vista;
     }
 
+    private void cargarCarritoPrincipal() {
+
+        ArrayList<orden>listaOrdenesCarrito=new ArrayList<>();
+
+        ConexBBDDHelper miConexion=new ConexBBDDHelper(getContext(),"ordenes",null,1);
+
+        SQLiteDatabase miBBDD=miConexion.getReadableDatabase();
+
+        Cursor miCursor=miBBDD.rawQuery("Select * FROM " + utilidadesBD.TABLA_ORDENES,null);
+
+        if(miCursor!=null){
+
+            orden miOrden=null;
+            while (miCursor.moveToNext()){
+
+                miOrden=new orden();
+
+                miOrden.setRutaImagenOrden(miCursor.getString(2));
+                miOrden.setCantidadOrden(miCursor.getInt(4));
+
+                listaOrdenesCarrito.add(miOrden);
+            }
+
+            if(listaOrdenesCarrito.size()!=0){
+
+                adapterCarritoPrincipal adapterCarrito=new adapterCarritoPrincipal(getContext(),listaOrdenesCarrito,getActivity());
+
+                miRecyclerCarrito.setAdapter(adapterCarrito);
+            }
+        }
+    }
 
 
     private void cargarWebServiceUrl(final String categoria) {
@@ -306,7 +346,7 @@ public class principal extends Fragment  {
         void onFragmentInteraction(Uri uri);
     }
 
-    RecyclerView miRecyclerBebidas,miRecyclerFerre,miRecyclerAli,miRecyclerDulces,miRecyclerLicores;
+    RecyclerView miRecyclerCarrito, miRecyclerBebidas,miRecyclerFerre,miRecyclerAli,miRecyclerDulces,miRecyclerLicores;
 
     TextView txtBebidas,txtFerreteria,txtAlimentos,txtDulces,txtLicores;
 }

@@ -9,6 +9,7 @@ public class orden {
     private String rutaImagenOrden;
     private double precioProductoOrden;
     private double precioTotalOrden;
+    private boolean ordenExistente;
 
     public String getNombreOrden() {
         return nombreOrden;
@@ -64,5 +65,13 @@ public class orden {
 
     public void setIdProductoOrden(int idProductoOrden) {
         this.idProductoOrden = idProductoOrden;
+    }
+
+    public boolean isOrdenExistente() {
+        return ordenExistente;
+    }
+
+    public void setOrdenExistente(boolean ordenExistente) {
+        this.ordenExistente = ordenExistente;
     }
 }

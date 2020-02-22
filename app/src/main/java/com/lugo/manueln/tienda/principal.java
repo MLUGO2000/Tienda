@@ -178,7 +178,7 @@ public class principal extends Fragment  {
         return vista;
     }
 
-    private void cargarCarritoPrincipal() {
+    public void cargarCarritoPrincipal() {
 
         ArrayList<orden>listaOrdenesCarrito=new ArrayList<>();
 

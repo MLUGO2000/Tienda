@@ -108,13 +108,17 @@ public class carroOrdenFragment extends Fragment {
                 miOrden=new orden();
 
 
+
                 miOrden.setIdProductoOrden(miCursor.getInt(0));
                 miOrden.setNombreOrden(miCursor.getString(1));
                 miOrden.setRutaImagenOrden(miCursor.getString(2));
                 miOrden.setPrecioProductoOrden(miCursor.getDouble(3));
                 miOrden.setCantidadOrden(miCursor.getInt(4));
 
-                precioTotalOrden+=(miOrden.getPrecioProductoOrden()*miOrden.getCantidadOrden());
+                double precioOrden=miOrden.getPrecioProductoOrden()*miOrden.getCantidadOrden();
+                miOrden.setPrecioTotalOrden(precioOrden);
+
+                precioTotalOrden+=precioOrden;
                 miListOrden.add(miOrden);
             }
 
@@ -131,6 +135,18 @@ public class carroOrdenFragment extends Fragment {
         textViewTotal.setText("Total: " + precioTotalOrden);
 
 
+
+    }
+
+    public void reActualizaPrecio(ArrayList<orden> miListaPrecio){
+
+        double precioTotal=0;
+        for(int i=0;i<miListaPrecio.size();i++){
+
+            precioTotal+=miListaPrecio.get(i).getPrecioTotalOrden();
+        }
+
+        textViewTotal.setText("Total: " + precioTotal);
 
     }
 

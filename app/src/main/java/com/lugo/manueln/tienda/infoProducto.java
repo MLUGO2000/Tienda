@@ -237,7 +237,20 @@ public class infoProducto extends Fragment implements View.OnClickListener {
 
         Toast.makeText(getContext(), "Agregado", Toast.LENGTH_SHORT).show();
 
+        principal fragmentPrincipal=null;
+        try {
+            fragmentPrincipal = (principal) getActivity().getSupportFragmentManager().findFragmentById(R.id.framePrincipal);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
+
+
+        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();//Remueve el Fragment info
+
+        if(fragmentPrincipal!=null){
+            fragmentPrincipal.cargarCarritoPrincipal();//Refresca Carrito en Fragment Principal
+        }
 
 
     }
@@ -276,6 +289,9 @@ public class infoProducto extends Fragment implements View.OnClickListener {
         return ordenEdicion;
 
     }
+
+
+
 
     /**
      * This interface must be implemented by activities that contain this

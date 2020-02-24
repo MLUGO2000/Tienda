@@ -1,4 +1,4 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -6,13 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,24 +17,24 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.lugo.manueln.tienda.adapters.adapterProductoTodos;
+import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.adapters.adapterCategorias;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.AbstractQueue;
 import java.util.ArrayList;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link categoriaSeleccionada.OnFragmentInteractionListener} interface
+ * {@link categoriasFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link categoriaSeleccionada#newInstance} factory method to
+ * Use the {@link categoriasFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class categoriaSeleccionada extends Fragment {
+public class categoriasFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,8 +46,7 @@ public class categoriaSeleccionada extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-
-    public categoriaSeleccionada() {
+    public categoriasFragment() {
         // Required empty public constructor
     }
 
@@ -61,11 +56,11 @@ public class categoriaSeleccionada extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment categoriaSeleccionada.
+     * @return A new instance of fragment categoriasFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static categoriaSeleccionada newInstance(String param1, String param2) {
-        categoriaSeleccionada fragment = new categoriaSeleccionada();
+    public static categoriasFragment newInstance(String param1, String param2) {
+        categoriasFragment fragment = new categoriasFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -86,101 +81,63 @@ public class categoriaSeleccionada extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View vista= inflater.inflate(R.layout.fragment_categoria_seleccionada, container, false);
+        View vista= inflater.inflate(R.layout.fragment_categorias, container, false);
 
-        buscarCategoria=vista.findViewById(R.id.editBuscadorCategoria);
+        requestQueue=Volley.newRequestQueue(getContext());
 
-        miRecyclerSelec=vista.findViewById(R.id.buscarCategoriaRecycler);
+        miRecylcerCategorias=vista.findViewById(R.id.recyclerCatNombres);
 
-        LinearLayoutManager miManager=new LinearLayoutManager(getContext());
-        miManager.setOrientation(LinearLayoutManager.VERTICAL);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
 
-        miRecyclerSelec.setLayoutManager(miManager);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        colaPeticiones=Volley.newRequestQueue(getContext());
+        miRecylcerCategorias.setLayoutManager(layoutManager);
 
-        Bundle bundle=getArguments();
+        cargarNombresCategoria();
 
-        String categoria=bundle.getString("categoria");
 
-        cargarDatosProductosCategoria(categoria);
+
         return vista;
     }
 
+    private void cargarNombresCategoria() {
 
-    private void cargarDatosProductosCategoria(String categoriaSelec) {
+        nombresCategorias=new ArrayList<>();
 
         String ip=getString(R.string.ip);
 
-        String url=ip + "/WebTienda/wsJSONConsultarProductosCategoria.php?categoria=" + categoriaSelec;
+        String url=ip + "/WebTienda/wsJSONConsultarCategorias.php";
 
-        objectRequest=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+        objectRequest =new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
-                ArrayList<producto> miListaProductos = new ArrayList<producto>();
-                producto miProducto = null;
+                JSONArray miArrayObject=response.optJSONArray("categorias");
 
-                JSONArray jsonArray = response.optJSONArray("producto");
+                for(int i=0;i<miArrayObject.length();i++){
+                    JSONObject jsonObject=miArrayObject.optJSONObject(i);
 
-                try {
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        miProducto = new producto();
-
-                        JSONObject object = jsonArray.optJSONObject(i);
-
-                        miProducto.setIdP(object.optInt("id"));
-                        miProducto.setNombreP(object.optString("nombre"));
-                        miProducto.setCategoriaP(object.optString("categoria"));
-                        miProducto.setPrecioP(object.optInt("precio"));
-                        miProducto.setRutaImagenP(object.optString("ruta"));
-
-                        miListaProductos.add(miProducto);
-
-                    }
-
-                    final adapterProductoTodos miAdapter=new adapterProductoTodos(getContext(),miListaProductos,getActivity());
-
-                    miRecyclerSelec.setAdapter(miAdapter);
-
-                    buscarCategoria.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                            miAdapter.getFilter().filter(charSequence.toString());
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable editable) {
-
-                        }
-                    });
-
-                } catch (Exception ejson) {
-
-                    ejson.printStackTrace();
-                    Toast.makeText(getContext(), "No se ha podido establecer conexion con el servidor" +
-                            " " + response, Toast.LENGTH_LONG).show();
+                    nombresCategorias.add(jsonObject.optString("nombre"));
 
                 }
+
+                adapterCategorias miAdapteCat=new adapterCategorias(getContext(),nombresCategorias,getActivity());
+                miRecylcerCategorias.setAdapter(miAdapteCat);
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.e("Error Web","Error Volley de Tipo :"  + error);
+                Toast.makeText(getContext(), "Error de Tipo" + error.toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
 
-        colaPeticiones.add(objectRequest);
+        requestQueue.add(objectRequest);
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -222,10 +179,8 @@ public class categoriaSeleccionada extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-
-    private RecyclerView miRecyclerSelec;
-    private EditText buscarCategoria;
-
-    private JsonObjectRequest objectRequest;
-    private RequestQueue colaPeticiones;
+    RecyclerView miRecylcerCategorias;
+    ArrayList<String> nombresCategorias;
+    JsonObjectRequest objectRequest;
+    RequestQueue requestQueue;
 }

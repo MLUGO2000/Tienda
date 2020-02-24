@@ -20,7 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
-import com.lugo.manueln.tienda.producto;
+import com.lugo.manueln.tienda.modelo.producto;
 
 import java.util.ArrayList;
 

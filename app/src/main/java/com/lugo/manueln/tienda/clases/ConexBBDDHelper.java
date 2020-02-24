@@ -1,4 +1,4 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.clases;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

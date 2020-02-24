@@ -1,6 +1,8 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.fragments;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,18 +11,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.lugo.manueln.tienda.adapters.adapterCategorias;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
+import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.adapters.adapterCarrito;
+import com.lugo.manueln.tienda.modelo.orden;
+import com.lugo.manueln.tienda.clases.utilidadesBD;
 
 import java.util.ArrayList;
 
@@ -28,12 +25,12 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link categoriasFragment.OnFragmentInteractionListener} interface
+ * {@link carroOrdenFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link categoriasFragment#newInstance} factory method to
+ * Use the {@link carroOrdenFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class categoriasFragment extends Fragment {
+public class carroOrdenFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -45,7 +42,7 @@ public class categoriasFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public categoriasFragment() {
+    public carroOrdenFragment() {
         // Required empty public constructor
     }
 
@@ -55,11 +52,11 @@ public class categoriasFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment categoriasFragment.
+     * @return A new instance of fragment carroOrdenFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static categoriasFragment newInstance(String param1, String param2) {
-        categoriasFragment fragment = new categoriasFragment();
+    public static carroOrdenFragment newInstance(String param1, String param2) {
+        carroOrdenFragment fragment = new carroOrdenFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -80,62 +77,80 @@ public class categoriasFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View vista= inflater.inflate(R.layout.fragment_categorias, container, false);
+        View vista= inflater.inflate(R.layout.fragment_carro_orden, container, false);
 
-        requestQueue=Volley.newRequestQueue(getContext());
+        textViewTotal=vista.findViewById(R.id.txtTotalOrden);
+        recyclerCarrito=vista.findViewById(R.id.recyclerCarro);
 
-        miRecylcerCategorias=vista.findViewById(R.id.recyclerCatNombres);
+        LinearLayoutManager miManager=new LinearLayoutManager(getContext());
 
-        LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
+        miManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerCarrito.setLayoutManager(miManager);
 
-        miRecylcerCategorias.setLayoutManager(layoutManager);
-
-        cargarNombresCategoria();
-
-
+        cargarListaCarrito();
 
         return vista;
     }
 
-    private void cargarNombresCategoria() {
+    private void cargarListaCarrito() {
 
-        nombresCategorias=new ArrayList<>();
+        double precioTotalOrden=0.0;
+        ConexBBDDHelper miConexion=new ConexBBDDHelper(getContext(),"ordenes",null,1);
 
-        String ip=getString(R.string.ip);
+        SQLiteDatabase miBBDD=miConexion.getReadableDatabase();
 
-        String url=ip + "/WebTienda/wsJSONConsultarCategorias.php";
+        Cursor miCursor=miBBDD.rawQuery("SELECT * FROM " + utilidadesBD.TABLA_ORDENES,null);
+
+        ArrayList<orden> miListOrden=new ArrayList<>();
+        if(miCursor!=null){
+
+            orden miOrden=null;
+
+            while (miCursor.moveToNext()){
+
+                miOrden=new orden();
 
 
-        objectRequest =new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
 
-                JSONArray miArrayObject=response.optJSONArray("categorias");
+                miOrden.setIdProductoOrden(miCursor.getInt(0));
+                miOrden.setNombreOrden(miCursor.getString(1));
+                miOrden.setRutaImagenOrden(miCursor.getString(2));
+                miOrden.setPrecioProductoOrden(miCursor.getDouble(3));
+                miOrden.setCantidadOrden(miCursor.getInt(4));
 
-                for(int i=0;i<miArrayObject.length();i++){
-                    JSONObject jsonObject=miArrayObject.optJSONObject(i);
+                double precioOrden=miOrden.getPrecioProductoOrden()*miOrden.getCantidadOrden();
+                miOrden.setPrecioTotalOrden(precioOrden);
 
-                    nombresCategorias.add(jsonObject.optString("nombre"));
-
-                }
-
-                adapterCategorias miAdapteCat=new adapterCategorias(getContext(),nombresCategorias,getActivity());
-                miRecylcerCategorias.setAdapter(miAdapteCat);
-
+                precioTotalOrden+=precioOrden;
+                miListOrden.add(miOrden);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getContext(), "Error de Tipo" + error.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
+
+        if(miListOrden.size()!=0){
+            adapterCarrito miAdapterCarrito=new adapterCarrito(getContext(),miListOrden,getActivity());
+
+            recyclerCarrito.setAdapter(miAdapterCarrito);
+
+        }
 
 
-        requestQueue.add(objectRequest);
+        textViewTotal.setText("Total: " + precioTotalOrden);
 
+
+
+    }
+
+    public void reActualizaPrecio(ArrayList<orden> miListaPrecio){
+
+        double precioTotal=0;
+        for(int i=0;i<miListaPrecio.size();i++){
+
+            precioTotal+=miListaPrecio.get(i).getPrecioTotalOrden();
+        }
+
+        textViewTotal.setText("Total: " + precioTotal);
 
     }
 
@@ -178,8 +193,8 @@ public class categoriasFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    RecyclerView miRecylcerCategorias;
-    ArrayList<String> nombresCategorias;
-    JsonObjectRequest objectRequest;
-    RequestQueue requestQueue;
+
+    RecyclerView recyclerCarrito;
+    TextView textViewTotal;
+
 }

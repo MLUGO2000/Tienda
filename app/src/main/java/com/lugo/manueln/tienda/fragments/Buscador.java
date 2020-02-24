@@ -1,4 +1,4 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -21,7 +21,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterProductoTodos;
+import com.lugo.manueln.tienda.modelo.producto;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

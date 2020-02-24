@@ -1,4 +1,4 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.clases;
 
 public class utilidadesBD {
 

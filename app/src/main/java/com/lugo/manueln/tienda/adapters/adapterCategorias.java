@@ -3,7 +3,6 @@ package com.lugo.manueln.tienda.adapters;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -13,9 +12,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lugo.manueln.tienda.R;
-import com.lugo.manueln.tienda.categoriaSeleccionada;
+import com.lugo.manueln.tienda.fragments.categoriaSeleccionada;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
 
 public class adapterCategorias extends RecyclerView.Adapter<adapterCategorias.MyAdapterCat> {

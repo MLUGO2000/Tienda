@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,15 +21,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
-import com.lugo.manueln.tienda.ConexBBDDHelper;
+import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
 import com.lugo.manueln.tienda.R;
-import com.lugo.manueln.tienda.carroOrdenFragment;
-import com.lugo.manueln.tienda.orden;
-import com.lugo.manueln.tienda.producto;
-import com.lugo.manueln.tienda.utilidadesBD;
+import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.modelo.orden;
+import com.lugo.manueln.tienda.clases.utilidadesBD;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class adapterCarrito extends RecyclerView.Adapter<adapterCarrito.MyViewHolder> {
 

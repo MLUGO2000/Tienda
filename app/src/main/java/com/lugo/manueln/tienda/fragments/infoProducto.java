@@ -1,11 +1,9 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +24,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
+import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.modelo.orden;
+import com.lugo.manueln.tienda.modelo.producto;
+import com.lugo.manueln.tienda.clases.utilidadesBD;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

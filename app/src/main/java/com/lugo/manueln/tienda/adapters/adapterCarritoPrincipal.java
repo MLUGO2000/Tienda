@@ -18,8 +18,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
-import com.lugo.manueln.tienda.carroOrdenFragment;
-import com.lugo.manueln.tienda.orden;
+import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.modelo.orden;
 
 import java.util.ArrayList;
 

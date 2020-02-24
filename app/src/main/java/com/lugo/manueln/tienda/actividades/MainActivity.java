@@ -1,4 +1,4 @@
-package com.lugo.manueln.tienda;
+package com.lugo.manueln.tienda.actividades;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
+
+import com.lugo.manueln.tienda.fragments.Buscador;
+import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.fragments.categoriasFragment;
+import com.lugo.manueln.tienda.interfaces.interFragments;
+import com.lugo.manueln.tienda.fragments.principal;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,interFragments {

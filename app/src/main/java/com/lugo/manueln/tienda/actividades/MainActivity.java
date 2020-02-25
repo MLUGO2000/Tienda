@@ -1,5 +1,6 @@
 package com.lugo.manueln.tienda.actividades;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -109,6 +110,12 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_ubi) {
 
+            Intent miIntent=new Intent(this,MapsActivity.class);
+
+            startActivity(miIntent);
+
+
+
         }
 
         Fragment fragmentAux=this.getSupportFragmentManager().findFragmentById(R.id.frameAuxiliar);
@@ -119,7 +126,9 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.framePrincipal,miFragment).addToBackStack(null).commit();
+       if(miFragment!=null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.framePrincipal,miFragment).addToBackStack(null).commit();
+       }
 
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);

@@ -20,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.producto;
 
 import java.util.ArrayList;
@@ -93,7 +94,8 @@ public class adapterProductoTodos extends RecyclerView.Adapter<adapterProductoTo
             }
         });
 
-        queue.add(imageRequest);
+        VolleySingleton.getIntanciaVolley(context).addToRequestQueue(imageRequest);
+        //queue.add(imageRequest);
     }
 
     @Override

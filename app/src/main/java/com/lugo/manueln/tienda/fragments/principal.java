@@ -25,6 +25,7 @@ import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterCarritoPrincipal;
 import com.lugo.manueln.tienda.adapters.adapterProducto;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.orden;
 import com.lugo.manueln.tienda.modelo.producto;
 import com.lugo.manueln.tienda.clases.utilidadesBD;
@@ -302,7 +303,8 @@ public class principal extends Fragment  {
         });
 
 
-        requestQueue.add(jsonObjectRequestUrl);
+        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(jsonObjectRequestUrl);
+        //requestQueue.add(jsonObjectRequestUrl);
 
 
     }

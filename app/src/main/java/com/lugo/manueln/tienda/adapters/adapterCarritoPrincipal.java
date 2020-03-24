@@ -19,6 +19,7 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.orden;
 
 import java.util.ArrayList;
@@ -93,7 +94,8 @@ public class adapterCarritoPrincipal extends RecyclerView.Adapter<adapterCarrito
             }
         });
 
-        requestCola.add(imageRequestProducto);
+        VolleySingleton.getIntanciaVolley(context).addToRequestQueue(imageRequestProducto);
+        //requestCola.add(imageRequestProducto);
     }
 
     @Override

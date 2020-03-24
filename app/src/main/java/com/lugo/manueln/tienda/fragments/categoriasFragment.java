@@ -19,6 +19,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterCategorias;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -135,7 +136,8 @@ public class categoriasFragment extends Fragment {
         });
 
 
-        requestQueue.add(objectRequest);
+        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(objectRequest);
+        //requestQueue.add(objectRequest);
 
 
     }

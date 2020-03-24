@@ -23,6 +23,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterProductoTodos;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.producto;
 
 import org.json.JSONArray;
@@ -181,7 +182,8 @@ public class categoriaSeleccionada extends Fragment {
         });
 
 
-        colaPeticiones.add(objectRequest);
+        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(objectRequest);
+       // colaPeticiones.add(objectRequest);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

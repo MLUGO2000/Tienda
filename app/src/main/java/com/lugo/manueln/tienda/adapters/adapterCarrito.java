@@ -24,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.orden;
 import com.lugo.manueln.tienda.clases.utilidadesBD;
 
@@ -128,7 +129,8 @@ public class adapterCarrito extends RecyclerView.Adapter<adapterCarrito.MyViewHo
             }
         });
 
-        requestCola.add(imageRequest);
+        VolleySingleton.getIntanciaVolley(context).addToRequestQueue(imageRequest);
+        //requestCola.add(imageRequest);
     }
 
     @Override

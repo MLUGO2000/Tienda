@@ -26,6 +26,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
 import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.orden;
 import com.lugo.manueln.tienda.modelo.producto;
 import com.lugo.manueln.tienda.clases.utilidadesBD;
@@ -145,7 +146,8 @@ public class infoProducto extends Fragment implements View.OnClickListener {
             }
         });
 
-        colaRequest.add(objectProducto);
+        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(objectProducto);
+        //colaRequest.add(objectProducto);
     }
 
     private void cargarImagen(String ruta) {
@@ -167,7 +169,8 @@ public class infoProducto extends Fragment implements View.OnClickListener {
             }
         });
 
-        colaRequest.add(image);
+        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(image);
+        //colaRequest.add(image);
 
     }
 

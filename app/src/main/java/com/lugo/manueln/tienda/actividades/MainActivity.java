@@ -1,6 +1,8 @@
 package com.lugo.manueln.tienda.actividades;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,10 +10,12 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.lugo.manueln.tienda.fragments.Buscador;
 import com.lugo.manueln.tienda.R;
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
 
         Fragment fragmentP=new principal();
 
@@ -78,9 +83,40 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.item_cerrar_sesion:
+
+                AlertDialog.Builder alertDialog=new AlertDialog.Builder(this);
+                alertDialog.setTitle("Cerrar Sesión");
+                alertDialog.setMessage("Salir de Sesion Actual");
+                alertDialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        SharedPreferences sharedPreferences=getSharedPreferences("PreferencesLogin",MODE_PRIVATE);
+                        sharedPreferences.edit().clear().commit();
+                        Intent miIntent=new Intent(getApplicationContext(),LoginActivity.class);
+                        startActivity(miIntent);
+                        finish();
+
+                    }
+                });
+                alertDialog.setNegativeButton("Volver", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                alertDialog.show();
+
+
+                break;
+
+            case R.id.action_settings:
+
+                break;
+
         }
 
         return super.onOptionsItemSelected(item);

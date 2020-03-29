@@ -1,6 +1,8 @@
 package com.lugo.manueln.tienda.actividades;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -34,14 +36,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         buttonEntrar.setOnClickListener(this);
 
+        recuperarPreferenciasCliente();
+
     }
-
-
-
-
-    EditText editUser,editPassword;
-    Button buttonEntrar;
-    String user,pass;
 
     @Override
     public void onClick(View view) {
@@ -73,6 +70,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(getApplicationContext(),"Bienvenido",Toast.LENGTH_SHORT).show();
                     Intent i=new Intent(LoginActivity.this,MainActivity.class);
                     startActivity(i);
+                    guardarPreferenciasCliente();
                     finish();
                 }else{
                     Toast.makeText(LoginActivity.this,"Usuario o Contraseña Incorrecta",Toast.LENGTH_SHORT).show();
@@ -98,4 +96,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         VolleySingleton.getIntanciaVolley(this).addToRequestQueue(request);
     }
+
+    private void recuperarPreferenciasCliente() {
+
+        SharedPreferences preferences=getSharedPreferences("PreferencesLogin",Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor=preferences.edit();
+
+        editor.putString("User",user);
+        editor.putString("Pass",pass);
+        editor.putBoolean("sesion",true);
+
+        editor.commit();
+    }
+
+
+    private void guardarPreferenciasCliente() {
+
+        SharedPreferences preferences=getSharedPreferences("PreferencesLogin",Context.MODE_PRIVATE);
+
+        editUser.setText(preferences.getString("User","correo@gmail.com"));
+        editPassword.setText(preferences.getString("Pass","123456"));
+    }
+
+    EditText editUser,editPassword;
+    Button buttonEntrar;
+    String user,pass;
 }

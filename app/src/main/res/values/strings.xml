@@ -6,6 +6,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="cerrar_sesion">CERRAR SESION</string>
 
     <string name="user">Usuario</string>
     <string name="password">Contraseña</string>
@@ -15,6 +16,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-    <string name="ip">http://192.168.0.107</string>
+    <string name="ip">http://192.168.0.106</string>
     <string name="title_activity_maps">Map</string>
 </resources>

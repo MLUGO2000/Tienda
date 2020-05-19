@@ -1,27 +1,29 @@
 package com.lugo.manueln.tienda.actividades;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lugo.manueln.tienda.Presenters.LoginPresenter;
 import com.lugo.manueln.tienda.R;
-import com.lugo.manueln.tienda.modelo.VolleySingleton;
+import com.lugo.manueln.tienda.interfaces.Interlogin;
 
-import java.util.HashMap;
-import java.util.Map;
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener,Interlogin.View {
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+    private Interlogin.Presenter myPresenter;
+    private String user,pass;
+    private EditText editUser,editPassword;
+    private Button buttonEntrar;
+
+    public LoginActivity(){
+
+        myPresenter=new LoginPresenter(this);
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +38,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         buttonEntrar.setOnClickListener(this);
 
-        recuperarPreferenciasCliente();
-
     }
 
     @Override
@@ -46,21 +46,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         user=editUser.getText().toString();
         pass=editPassword.getText().toString();
 
-        if(!user.isEmpty() & !pass.isEmpty()){
-
-            String ip=getString(R.string.ip);
-
-            String url=ip + "/WebTienda/wsJSONInicioSesion.php";
-            
-            revisarUsuario(url);
-
-        }else {
-            Toast.makeText(this,"Por Favor Introducir Datos",Toast.LENGTH_SHORT).show();
+        if(myPresenter!=null){
+            myPresenter.validateUserPresenter(user,pass,this);
         }
+
+
 
     }
 
-    private void revisarUsuario(String url) {
+  /*  private void revisarUsuario(String url) {
 
         StringRequest request=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -95,31 +89,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         };
 
         VolleySingleton.getIntanciaVolley(this).addToRequestQueue(request);
+    }*/
+
+
+
+
+    @Override
+    public void validateUser() {
+
+        if(myPresenter!=null){
+
+           // myPresenter.validateUserPresenter(user,pass,get);
+        }
     }
 
-    private void recuperarPreferenciasCliente() {
 
-        SharedPreferences preferences=getSharedPreferences("PreferencesLogin",Context.MODE_PRIVATE);
+    @Override
+    public void showIncorrectUserOrPass() {
 
-        SharedPreferences.Editor editor=preferences.edit();
+        Toast.makeText(this,"Correo o Contraseña Incorrecta",Toast.LENGTH_SHORT).show();
 
-        editor.putString("User",user);
-        editor.putString("Pass",pass);
-        editor.putBoolean("sesion",true);
-
-        editor.commit();
     }
 
+    @Override
+    public void showErrorLogin(String error) {
 
-    private void guardarPreferenciasCliente() {
-
-        SharedPreferences preferences=getSharedPreferences("PreferencesLogin",Context.MODE_PRIVATE);
-
-        editUser.setText(preferences.getString("User","correo@gmail.com"));
-        editPassword.setText(preferences.getString("Pass","123456"));
     }
-
-    EditText editUser,editPassword;
-    Button buttonEntrar;
-    String user,pass;
 }

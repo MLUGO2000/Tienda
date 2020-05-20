@@ -23,10 +23,8 @@ public class LoginPresenter implements Interlogin.Presenter {
     @Override
     public void validateUserPresenter(String user,String password,Activity myActivity) {
 
-        if(myInteractor!=null){
-
             myInteractor.validateUserInteractor(user,password,myActivity);
-        }
+
     }
 
 
@@ -42,6 +40,15 @@ public class LoginPresenter implements Interlogin.Presenter {
     @Override
     public void showErrorLogin(String error) {
 
+        if(myView!=null){
+
+            myView.showErrorLogin(error);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        myView=null;
     }
 
 }

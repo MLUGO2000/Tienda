@@ -19,6 +19,7 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.modelo.URL;
 import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.orden;
 
@@ -77,7 +78,7 @@ public class adapterCarritoPrincipal extends RecyclerView.Adapter<adapterCarrito
 
     private void cargarImagen(final MyViewHolder holder, String url) {
 
-        String ip=context.getString(R.string.ip);
+        String ip=URL.ip;
 
         String urlImagen=ip + "/WebTienda/" + url;
 

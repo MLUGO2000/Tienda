@@ -1,9 +1,6 @@
 package com.lugo.manueln.tienda.fragments;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,22 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
+import com.lugo.manueln.tienda.Presenters.infoProductoPresenter;
 import com.lugo.manueln.tienda.R;
-import com.lugo.manueln.tienda.modelo.VolleySingleton;
-import com.lugo.manueln.tienda.modelo.orden;
+import com.lugo.manueln.tienda.interfaces.interInfoProducto;
 import com.lugo.manueln.tienda.modelo.producto;
-import com.lugo.manueln.tienda.clases.utilidadesBD;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 
 /**
@@ -43,36 +28,32 @@ import org.json.JSONObject;
  * Use the {@link infoProducto#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class infoProducto extends Fragment implements View.OnClickListener {
+public class infoProducto extends Fragment implements interInfoProducto.View {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "idProducto";
-    private static final String ARG_PARAM2 = "param2";
+
 
     // TODO: Rename and change types of parameters
     private int mParamId;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
 
+
+    interInfoProducto.Presenter presenter;
+
     public infoProducto() {
-        // Required empty public constructor
+
+        presenter=new infoProductoPresenter(this);
+
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment infoProducto.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static infoProducto newInstance(String param1, String param2) {
+    public static infoProducto newInstance(int paramId) {
         infoProducto fragment = new infoProducto();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_PARAM1, paramId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,7 +63,7 @@ public class infoProducto extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParamId = getArguments().getInt(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
     }
 
@@ -92,7 +73,7 @@ public class infoProducto extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View vista= inflater.inflate(R.layout.fragment_info_producto, container, false);
 
-        colaRequest=Volley.newRequestQueue(getContext());
+
 
         imagenProducto=vista.findViewById(R.id.imageProductoInfo);
         txtvNombre=vista.findViewById(R.id.txtNombreInfo);
@@ -101,78 +82,22 @@ public class infoProducto extends Fragment implements View.OnClickListener {
         bAgregar=vista.findViewById(R.id.buttonAgregar);
         editTextCantidad=vista.findViewById(R.id.editCantidad);
 
-        bAgregar.setOnClickListener(this);
+        bAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.addProductCar(getActivity(),Integer.parseInt(editTextCantidad.getText().toString()));
+            }
+        });
 
-        int id=mParamId;
 
-        cargarDatosProducto(id);
+
+        presenter.loadDataProduct(getActivity(),mParamId);
         return vista;
     }
 
-    private void cargarDatosProducto(int id) {
-
-        String ip=getString(R.string.ip);
-        String url=ip + "/WebTienda/wsJSONConsultarProducto.php?idProducto=" +id;
-
-        JsonObjectRequest objectProducto=new JsonObjectRequest(Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                JSONArray jsonArray=response.optJSONArray("producto");
-
-                JSONObject object=jsonArray.optJSONObject(0);
-
-                miProducto=new producto();
-
-                miProducto.setIdP(object.optInt("id"));
-                miProducto.setNombreP(object.optString("nombre"));
-                miProducto.setDescripcionP(object.optString("descripcion"));
-                miProducto.setCategoriaP(object.optString("categoria"));
-                miProducto.setPrecioP(object.optInt("precio"));
-                miProducto.setRutaImagenP(object.optString("ruta"));
-
-                txtvNombre.setText(miProducto.getNombreP());
-                txtvCategoria.setText(miProducto.getCategoriaP());
-                txtvPrecio.setText(miProducto.getPrecioP()+"$");
-
-                cargarImagen(miProducto.getRutaImagenP());
 
 
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
-            }
-        });
-
-        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(objectProducto);
-        //colaRequest.add(objectProducto);
-    }
-
-    private void cargarImagen(String ruta) {
-
-        String ip=getString(R.string.ip);
-        String urlImagen=ip+ "/WebTienda/" + ruta;
-
-        ImageRequest image=new ImageRequest(urlImagen, new Response.Listener<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap response) {
-
-                imagenProducto.setImageBitmap(response);
-
-            }
-        }, 0, 0, ImageView.ScaleType.CENTER, null, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-
-        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(image);
-        //colaRequest.add(image);
-
-    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -198,54 +123,31 @@ public class infoProducto extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
-    @Override
-    public void onClick(View view) {
 
-        agregarProductoCarrito();
+
+    @Override
+    public void showDataProduct(producto myProduct, Bitmap imageProduct) {
+
+        txtvNombre.setText(myProduct.getNombreP());
+        txtvCategoria.setText(myProduct.getCategoriaP());
+        txtvPrecio.setText(myProduct.getPrecioP()+"$");
+
+        imagenProducto.setImageBitmap(imageProduct);
     }
 
-    private void agregarProductoCarrito() {
+    @Override
+    public void showErrorProduct(String errorType) {
+        Toast.makeText(getContext(),"error de tipo:" + errorType,Toast.LENGTH_SHORT).show();
 
-        ConexBBDDHelper miConex = new ConexBBDDHelper(getContext(), "ordenes", null, 1);
+    }
 
-        SQLiteDatabase miBBDD = miConex.getWritableDatabase();
-
-        orden miOrden=verificarOrdenExistente(miProducto.getIdP());
-
-        if(!miOrden.isOrdenExistente()) {
-
-            ContentValues valores = new ContentValues();
-
-            valores.put(utilidadesBD.CAMPO_ID, miProducto.getIdP());
-            valores.put(utilidadesBD.CAMPO_NOMBRE, miProducto.getNombreP());
-            valores.put(utilidadesBD.CAMPO_PRECIO, miProducto.getPrecioP());
-            valores.put(utilidadesBD.CAMPO_URL, miProducto.getRutaImagenP());
-            valores.put(utilidadesBD.CAMPO_CANTIDAD, Integer.parseInt(editTextCantidad.getText().toString()));
-
-            miBBDD.insert(utilidadesBD.TABLA_ORDENES, null, valores);
-
-        }else {
-            ContentValues valores=new ContentValues();
-
-            double precioTotalNuevo=miOrden.getPrecioTotalOrden()+(miProducto.getPrecioP()*Integer.parseInt(editTextCantidad.getText().toString()));
-            int cantidadTotalNueva=miOrden.getCantidadOrden() + (Integer.parseInt(editTextCantidad.getText().toString()));
-
-
-            valores.put(utilidadesBD.CAMPO_TOTAL,precioTotalNuevo);
-            valores.put(utilidadesBD.CAMPO_CANTIDAD,cantidadTotalNueva);
-
-            int result=miBBDD.update(utilidadesBD.TABLA_ORDENES,valores,"id = ?" ,new String[]{""+miProducto.getIdP()});
-
-        }
-
-        miBBDD.close();
-        miConex.close();
-
+    @Override
+    public void addProdductCarSucces() {
         Toast.makeText(getContext(), "Agregado", Toast.LENGTH_SHORT).show();
 
-        principal fragmentPrincipal=null;
+        mainFragment fragmentMainFragment =null;
         try {
-            fragmentPrincipal = (principal) getActivity().getSupportFragmentManager().findFragmentById(R.id.framePrincipal);
+            fragmentMainFragment = (mainFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.framePrincipal);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -254,49 +156,10 @@ public class infoProducto extends Fragment implements View.OnClickListener {
 
         getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();//Remueve el Fragment info
 
-        if(fragmentPrincipal!=null){
-            fragmentPrincipal.cargarCarritoPrincipal();//Refresca Carrito en Fragment Principal
+        if(fragmentMainFragment !=null){
+            fragmentMainFragment.refreshMainCar();//Refresca Carrito en Fragment Principal
         }
-
-
     }
-
-    private orden verificarOrdenExistente(int id) {
-
-        orden ordenEdicion=new orden();
-
-        ordenEdicion.setOrdenExistente(true);
-
-        ConexBBDDHelper miConex= new ConexBBDDHelper(getContext(),"ordenes",null,1);
-
-        SQLiteDatabase db = miConex.getReadableDatabase();
-
-        Cursor miCursor=db.rawQuery("SELECT * FROM " + utilidadesBD.TABLA_ORDENES + " WHERE " +utilidadesBD.CAMPO_ID +  "= ?",new String[]{""+id});
-
-
-        if(miCursor.moveToNext()){
-            //Toast.makeText(getContext(), "Se Encontro un Registro con el mismo id", Toast.LENGTH_SHORT).show();
-
-            int cantidadTotalActual=miCursor.getInt(4);
-
-            double precioTotalActual=miCursor.getDouble(5);
-
-            ordenEdicion.setPrecioTotalOrden(precioTotalActual);
-            ordenEdicion.setCantidadOrden(cantidadTotalActual);
-            ordenEdicion.setOrdenExistente(true);
-        }else {
-            //Toast.makeText(getContext(), "No hay ningun Registro con esa id", Toast.LENGTH_SHORT).show();
-
-            ordenEdicion.setOrdenExistente(false);
-        }
-        miConex.close();
-        db.close();
-
-        return ordenEdicion;
-
-    }
-
-
 
 
     /**
@@ -315,10 +178,10 @@ public class infoProducto extends Fragment implements View.OnClickListener {
     }
 
 
-    RequestQueue colaRequest;
+
     ImageView imagenProducto;
     TextView txtvNombre,txtvCategoria,txtvPrecio;
     EditText editTextCantidad;
     Button bAgregar;
-    producto miProducto;
+    producto myProduct;
 }

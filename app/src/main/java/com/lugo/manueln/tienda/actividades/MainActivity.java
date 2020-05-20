@@ -16,18 +16,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lugo.manueln.tienda.Presenters.MainPresenter;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.fragments.Buscador;
 import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
 import com.lugo.manueln.tienda.fragments.categoriasFragment;
-import com.lugo.manueln.tienda.fragments.principal;
+import com.lugo.manueln.tienda.fragments.mainFragment;
 import com.lugo.manueln.tienda.interfaces.interFragments;
+import com.lugo.manueln.tienda.interfaces.interMain;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,interFragments {
 
+    interMain.Presenter presenter;
     public MainActivity(){
 
+        presenter=new MainPresenter(this);
 
     }
 
@@ -49,7 +53,14 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        Fragment fragmentP=new principal();
+
+        loadMainFragment();
+
+    }
+
+    private void loadMainFragment() {
+
+        Fragment fragmentP=new mainFragment();
 
         getSupportFragmentManager().beginTransaction().replace(R.id.framePrincipal,fragmentP).addToBackStack(null).commit();
     }
@@ -135,7 +146,7 @@ public class MainActivity extends AppCompatActivity
         Fragment miFragment=null;
         boolean fragmentSelect=false;
         if (id == R.id.nav_pri) {
-            miFragment=new principal();
+            miFragment=new mainFragment();
             fragmentSelect=true;
 
         } else if (id == R.id.nav_cat) {

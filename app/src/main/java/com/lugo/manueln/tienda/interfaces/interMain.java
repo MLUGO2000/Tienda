@@ -8,6 +8,10 @@ public interface interMain {
     }
     interface Presenter{
 
+
+
+
+
     }
 
     interface Interactor{

@@ -114,5 +114,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void showErrorLogin(String error) {
 
+        Toast.makeText(this,"Error tipo: " + error,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myPresenter.onDestroy();
     }
 }

@@ -47,7 +47,7 @@ public class LoginModule implements Interlogin.Interactor {
                     loadMainActivity(myActivity);
                 }else{
 
-                    showIncorrectUserOrPass();
+                    myPresenter.showIncorrectUserOrPassPresenter();
                 }
 
             }
@@ -55,7 +55,7 @@ public class LoginModule implements Interlogin.Interactor {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                showErrorLogin(error.toString());
+                myPresenter.showErrorLogin(error.toString());
             }
         }){
             @Override
@@ -77,23 +77,6 @@ public class LoginModule implements Interlogin.Interactor {
         ((BaseApp)myActivity.getApplication()).getComponentApi().inject(this);
     }
 
-    private void showErrorLogin(String e) {
-
-        if(myPresenter!=null){
-
-            myPresenter.showErrorLogin(e);
-
-        }
-    }
-
-
-
-    public void showIncorrectUserOrPass() {
-        if(myPresenter!=null){
-
-            showIncorrectUserOrPass();
-        }
-    }
 
     private void loadMainActivity(Activity activity){
 

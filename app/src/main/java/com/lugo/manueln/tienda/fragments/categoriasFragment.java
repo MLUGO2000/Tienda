@@ -19,6 +19,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterCategorias;
+import com.lugo.manueln.tienda.modelo.URL;
 import com.lugo.manueln.tienda.modelo.VolleySingleton;
 
 import org.json.JSONArray;
@@ -105,7 +106,7 @@ public class categoriasFragment extends Fragment {
 
         nombresCategorias=new ArrayList<>();
 
-        String ip=getString(R.string.ip);
+        String ip=URL.ip;
 
         String url=ip + "/WebTienda/wsJSONConsultarCategorias.php";
 

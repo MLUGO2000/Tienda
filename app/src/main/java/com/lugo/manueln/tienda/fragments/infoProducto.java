@@ -177,7 +177,11 @@ public class infoProducto extends Fragment implements interInfoProducto.View {
         void onFragmentInteraction(Uri uri);
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
 
     ImageView imagenProducto;
     TextView txtvNombre,txtvCategoria,txtvPrecio;

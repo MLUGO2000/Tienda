@@ -25,6 +25,8 @@ public interface interInfoProducto {
 
         void showErrorProduct(String errorType);
 
+        void onDestroy();
+
     }
 
     interface Interactor{

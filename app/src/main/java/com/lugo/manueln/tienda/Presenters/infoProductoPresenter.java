@@ -54,4 +54,9 @@ public class infoProductoPresenter implements interInfoProducto.Presenter {
             view.showErrorProduct(errorType);
         }
     }
+
+    @Override
+    public void onDestroy() {
+        view=null;
+    }
 }

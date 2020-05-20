@@ -21,12 +21,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
-import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
 import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
+import com.lugo.manueln.tienda.clases.utilidadesBD;
 import com.lugo.manueln.tienda.fragments.carroOrdenFragment;
+import com.lugo.manueln.tienda.modelo.URL;
 import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.orden;
-import com.lugo.manueln.tienda.clases.utilidadesBD;
 
 import java.util.ArrayList;
 
@@ -109,7 +110,7 @@ public class adapterCarrito extends RecyclerView.Adapter<adapterCarrito.MyViewHo
 
     private void cargarImagen(final MyViewHolder holder, String rutaImagenP) {
 
-        String ip=context.getString(R.string.ip);
+        String ip=URL.ip;
         String urlImagen=ip + "/WebTienda/"+ rutaImagenP;
         urlImagen=urlImagen.replace(" ","%20");
 

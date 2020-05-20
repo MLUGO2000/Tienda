@@ -1,8 +1,6 @@
 package com.lugo.manueln.tienda.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,11 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lugo.manueln.tienda.clases.ConexBBDDHelper;
+import com.lugo.manueln.tienda.Presenters.carroOrdenPresenter;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterCarrito;
+import com.lugo.manueln.tienda.interfaces.interCarroOrden;
 import com.lugo.manueln.tienda.modelo.orden;
-import com.lugo.manueln.tienda.clases.utilidadesBD;
 
 import java.util.ArrayList;
 
@@ -30,7 +28,7 @@ import java.util.ArrayList;
  * Use the {@link carroOrdenFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class carroOrdenFragment extends Fragment {
+public class carroOrdenFragment extends Fragment implements interCarroOrden.View {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -42,8 +40,11 @@ public class carroOrdenFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    interCarroOrden.Presenter presenter;
+
     public carroOrdenFragment() {
-        // Required empty public constructor
+
+        presenter=new carroOrdenPresenter(this);
     }
 
     /**
@@ -88,69 +89,34 @@ public class carroOrdenFragment extends Fragment {
 
         recyclerCarrito.setLayoutManager(miManager);
 
-        cargarListaCarrito();
+        presenter.loadCarList(getActivity());
+
 
         return vista;
     }
 
-    private void cargarListaCarrito() {
-
-        double precioTotalOrden=0.0;
-        ConexBBDDHelper miConexion=new ConexBBDDHelper(getContext(),"ordenes",null,1);
-
-        SQLiteDatabase miBBDD=miConexion.getReadableDatabase();
-
-        Cursor miCursor=miBBDD.rawQuery("SELECT * FROM " + utilidadesBD.TABLA_ORDENES,null);
-
-        ArrayList<orden> miListOrden=new ArrayList<>();
-        if(miCursor!=null){
-
-            orden miOrden=null;
-
-            while (miCursor.moveToNext()){
-
-                miOrden=new orden();
+    @Override
+    public void showCarList(ArrayList<orden> miListOrden, double priceTotal) {
 
 
+        textViewTotal.setText("Total: " + String.valueOf(priceTotal));
 
-                miOrden.setIdProductoOrden(miCursor.getInt(0));
-                miOrden.setNombreOrden(miCursor.getString(1));
-                miOrden.setRutaImagenOrden(miCursor.getString(2));
-                miOrden.setPrecioProductoOrden(miCursor.getDouble(3));
-                miOrden.setCantidadOrden(miCursor.getInt(4));
+        adapterCarrito adapterCarrito=new adapterCarrito(getContext(),miListOrden,getActivity());
 
-                double precioOrden=miOrden.getPrecioProductoOrden()*miOrden.getCantidadOrden();
-                miOrden.setPrecioTotalOrden(precioOrden);
-
-                precioTotalOrden+=precioOrden;
-                miListOrden.add(miOrden);
-            }
-
-        }
-
-        if(miListOrden.size()!=0){
-            adapterCarrito miAdapterCarrito=new adapterCarrito(getContext(),miListOrden,getActivity());
-
-            recyclerCarrito.setAdapter(miAdapterCarrito);
-
-        }
-
-
-        textViewTotal.setText("Total: " + precioTotalOrden);
-
-
-
+        recyclerCarrito.setAdapter(adapterCarrito);
     }
+
+    @Override
+    public void showUpdatePriceTotal(double priceTotal) {
+        textViewTotal.setText("Total: " + priceTotal);
+    }
+
+
+
 
     public void reActualizaPrecio(ArrayList<orden> miListaPrecio){
 
-        double precioTotal=0;
-        for(int i=0;i<miListaPrecio.size();i++){
-
-            precioTotal+=miListaPrecio.get(i).getPrecioTotalOrden();
-        }
-
-        textViewTotal.setText("Total: " + precioTotal);
+        presenter.updatePriceTotal(miListaPrecio);
 
     }
 
@@ -176,6 +142,13 @@ public class carroOrdenFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 
     /**

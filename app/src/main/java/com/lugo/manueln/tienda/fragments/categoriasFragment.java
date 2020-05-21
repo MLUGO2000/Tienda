@@ -11,19 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.Presenters.categoriasPresenter;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterCategorias;
-import com.lugo.manueln.tienda.modelo.URL;
-import com.lugo.manueln.tienda.modelo.VolleySingleton;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.lugo.manueln.tienda.interfaces.interCategorias;
 
 import java.util.ArrayList;
 
@@ -36,7 +27,7 @@ import java.util.ArrayList;
  * Use the {@link categoriasFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class categoriasFragment extends Fragment {
+public class categoriasFragment extends Fragment implements interCategorias.View{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -48,8 +39,12 @@ public class categoriasFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    interCategorias.Presenter presenter;
+
     public categoriasFragment() {
-        // Required empty public constructor
+
+        presenter=new categoriasPresenter(this);
+
     }
 
     /**
@@ -85,7 +80,6 @@ public class categoriasFragment extends Fragment {
         // Inflate the layout for this fragment
         View vista= inflater.inflate(R.layout.fragment_categorias, container, false);
 
-        requestQueue=Volley.newRequestQueue(getContext());
 
         miRecylcerCategorias=vista.findViewById(R.id.recyclerCatNombres);
 
@@ -95,52 +89,13 @@ public class categoriasFragment extends Fragment {
 
         miRecylcerCategorias.setLayoutManager(layoutManager);
 
-        cargarNombresCategoria();
+
+        presenter.loadNameCategories(getContext());
+
 
 
 
         return vista;
-    }
-
-    private void cargarNombresCategoria() {
-
-        nombresCategorias=new ArrayList<>();
-
-        String ip=URL.ip;
-
-        String url=ip + "/WebTienda/wsJSONConsultarCategorias.php";
-
-
-        objectRequest =new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                JSONArray miArrayObject=response.optJSONArray("categorias");
-
-                for(int i=0;i<miArrayObject.length();i++){
-                    JSONObject jsonObject=miArrayObject.optJSONObject(i);
-
-                    nombresCategorias.add(jsonObject.optString("nombre"));
-
-                }
-
-                adapterCategorias miAdapteCat=new adapterCategorias(getContext(),nombresCategorias,getActivity());
-                miRecylcerCategorias.setAdapter(miAdapteCat);
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Toast.makeText(getContext(), "Error de Tipo" + error.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(objectRequest);
-        //requestQueue.add(objectRequest);
-
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -167,6 +122,24 @@ public class categoriasFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    @Override
+    public void showNameCategories(ArrayList<String> nameCategories) {
+
+        adapterCategorias miAdapteCat=new adapterCategorias(getContext(),nameCategories,getActivity());
+        miRecylcerCategorias.setAdapter(miAdapteCat);
+    }
+
+    @Override
+    public void showError(String error) {
+        Toast.makeText(getContext(), "Error de Tipo" + error, Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -183,7 +156,5 @@ public class categoriasFragment extends Fragment {
     }
 
     RecyclerView miRecylcerCategorias;
-    ArrayList<String> nombresCategorias;
-    JsonObjectRequest objectRequest;
-    RequestQueue requestQueue;
+
 }

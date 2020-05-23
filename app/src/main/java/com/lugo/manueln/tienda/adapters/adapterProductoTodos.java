@@ -20,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
+import com.lugo.manueln.tienda.modelo.URL;
 import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.producto;
 
@@ -74,7 +75,7 @@ public class adapterProductoTodos extends RecyclerView.Adapter<adapterProductoTo
 
     private void cargarImagen(final MyAdapterProducto holder, String rutaImagenP) {
 
-        String ip=context.getString(R.string.ip);
+        String ip=URL.ip;
         String urlImagen=ip + "/WebTienda/"+ rutaImagenP;
         urlImagen=urlImagen.replace(" ","%20");
 

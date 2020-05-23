@@ -8,26 +8,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.Presenters.categoriaSeleccionadaPresenter;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterProductoTodos;
-import com.lugo.manueln.tienda.modelo.VolleySingleton;
+import com.lugo.manueln.tienda.interfaces.interCategoriaSeleccionada;
 import com.lugo.manueln.tienda.modelo.producto;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -40,7 +33,7 @@ import java.util.ArrayList;
  * Use the {@link categoriaSeleccionada#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class categoriaSeleccionada extends Fragment {
+public class categoriaSeleccionada extends Fragment implements interCategoriaSeleccionada.View{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -52,9 +45,12 @@ public class categoriaSeleccionada extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    interCategoriaSeleccionada.Presenter presenter;
 
     public categoriaSeleccionada() {
-        // Required empty public constructor
+
+        presenter=new categoriaSeleccionadaPresenter(this);
+
     }
 
     /**
@@ -98,93 +94,20 @@ public class categoriaSeleccionada extends Fragment {
         miManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         miRecyclerSelec.setLayoutManager(miManager);
-
-        colaPeticiones=Volley.newRequestQueue(getContext());
+        
 
         Bundle bundle=getArguments();
 
         String categoria=bundle.getString("categoria");
 
-        cargarDatosProductosCategoria(categoria);
+
+        presenter.loadDateProductsCategories(categoria,getActivity());
+
         return vista;
     }
 
 
-    private void cargarDatosProductosCategoria(String categoriaSelec) {
 
-        String ip=getString(R.string.ip);
-
-        String url=ip + "/WebTienda/wsJSONConsultarProductosCategoria.php?categoria=" + categoriaSelec;
-
-        objectRequest=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                ArrayList<producto> miListaProductos = new ArrayList<producto>();
-                producto miProducto = null;
-
-                JSONArray jsonArray = response.optJSONArray("producto");
-
-                try {
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        miProducto = new producto();
-
-                        JSONObject object = jsonArray.optJSONObject(i);
-
-                        miProducto.setIdP(object.optInt("id"));
-                        miProducto.setNombreP(object.optString("nombre"));
-                        miProducto.setCategoriaP(object.optString("categoria"));
-                        miProducto.setPrecioP(object.optInt("precio"));
-                        miProducto.setRutaImagenP(object.optString("ruta"));
-
-                        miListaProductos.add(miProducto);
-
-                    }
-
-                    final adapterProductoTodos miAdapter=new adapterProductoTodos(getContext(),miListaProductos,getActivity());
-
-                    miRecyclerSelec.setAdapter(miAdapter);
-
-                    buscarCategoria.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                            miAdapter.getFilter().filter(charSequence.toString());
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable editable) {
-
-                        }
-                    });
-
-                } catch (Exception ejson) {
-
-                    ejson.printStackTrace();
-                    Toast.makeText(getContext(), "No se ha podido establecer conexion con el servidor" +
-                            " " + response, Toast.LENGTH_LONG).show();
-
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Log.e("Error Web","Error Volley de Tipo :"  + error);
-            }
-        });
-
-
-        VolleySingleton.getIntanciaVolley(getContext()).addToRequestQueue(objectRequest);
-       // colaPeticiones.add(objectRequest);
-    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -210,6 +133,36 @@ public class categoriaSeleccionada extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void showDateProductsCategories(ArrayList<producto> listProducts) {
+        final adapterProductoTodos miAdapter=new adapterProductoTodos(getContext(),listProducts,getActivity());
+
+        miRecyclerSelec.setAdapter(miAdapter);
+
+        buscarCategoria.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                miAdapter.getFilter().filter(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+
+    @Override
+    public void showError(String error) {
+        Toast.makeText(getContext(),"Se produjo un error de tipo: " + error ,Toast.LENGTH_LONG);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -225,6 +178,11 @@ public class categoriaSeleccionada extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
 
     private RecyclerView miRecyclerSelec;
     private EditText buscarCategoria;

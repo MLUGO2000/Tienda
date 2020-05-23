@@ -155,6 +155,7 @@ public class categoriasFragment extends Fragment implements interCategorias.View
         void onFragmentInteraction(Uri uri);
     }
 
+
     RecyclerView miRecylcerCategorias;
 
 }

@@ -21,8 +21,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.lugo.manueln.tienda.Presenters.PresenterBuscador;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.adapters.adapterProductoTodos;
+import com.lugo.manueln.tienda.interfaces.interBuscador;
+import com.lugo.manueln.tienda.modelo.URL;
 import com.lugo.manueln.tienda.modelo.VolleySingleton;
 import com.lugo.manueln.tienda.modelo.producto;
 
@@ -40,7 +43,7 @@ import java.util.ArrayList;
  * Use the {@link Buscador#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Buscador extends Fragment {
+public class Buscador extends Fragment implements interBuscador.View {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -52,8 +55,11 @@ public class Buscador extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    interBuscador.Presenter presenter;
     public Buscador() {
-        // Required empty public constructor
+
+        this.presenter=new PresenterBuscador(this);
+
     }
 
     /**
@@ -100,9 +106,11 @@ public class Buscador extends Fragment {
 
         recyclerBuscador.setLayoutManager(miManager);
 
-        cargarDatosProductos();
+        presenter.loadDateProducts(getActivity());
 
-        editBuscar=vista.findViewById(R.id.editBuscador);
+      //  cargarDatosProductos();
+
+
 
 
 
@@ -112,7 +120,7 @@ public class Buscador extends Fragment {
 
     private void cargarDatosProductos() {
 
-        String ip=getString(R.string.ip);
+        String ip=URL.ip;
 
         String url=ip + "/WebTienda/wsJSONConsultarProductosTodos.php";
 
@@ -210,6 +218,38 @@ public class Buscador extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void showDateProducts(ArrayList<producto> miListaProductos) {
+
+        final adapterProductoTodos miAdapter=new adapterProductoTodos(getContext(),miListaProductos,getActivity());
+
+        recyclerBuscador.setAdapter(miAdapter);
+
+        editBuscar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                miAdapter.getFilter().filter(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+    }
+
+    @Override
+    public void showError(String messageError) {
+        Toast.makeText(getContext(),"Error tipo: " + messageError,Toast.LENGTH_LONG).show();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -225,6 +265,11 @@ public class Buscador extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
 
     private EditText editBuscar;
     private RecyclerView recyclerBuscador;

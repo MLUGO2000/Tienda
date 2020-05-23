@@ -18,7 +18,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.Volley;
 import com.lugo.manueln.tienda.R;
 import com.lugo.manueln.tienda.modelo.URL;
 import com.lugo.manueln.tienda.modelo.VolleySingleton;
@@ -42,7 +41,6 @@ public class adapterProductoTodos extends RecyclerView.Adapter<adapterProductoTo
         miActividad=actividad;
         context=contexto;
         miListProducto=lista;
-        queue=Volley.newRequestQueue(contexto);
         miListProductoFiltrada=new ArrayList<>();
         miListProductoFiltrada.addAll(lista);
         mFilter=new CustomFilter(adapterProductoTodos.this);
@@ -96,7 +94,7 @@ public class adapterProductoTodos extends RecyclerView.Adapter<adapterProductoTo
         });
 
         VolleySingleton.getIntanciaVolley(context).addToRequestQueue(imageRequest);
-        //queue.add(imageRequest);
+
     }
 
     @Override

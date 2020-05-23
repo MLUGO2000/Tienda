@@ -94,7 +94,7 @@ public class categoriaSeleccionada extends Fragment implements interCategoriaSel
         miManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         miRecyclerSelec.setLayoutManager(miManager);
-        
+
 
         Bundle bundle=getArguments();
 

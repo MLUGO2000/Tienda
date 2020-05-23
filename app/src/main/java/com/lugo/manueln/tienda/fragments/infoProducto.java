@@ -187,5 +187,5 @@ public class infoProducto extends Fragment implements interInfoProducto.View {
     TextView txtvNombre,txtvCategoria,txtvPrecio;
     EditText editTextCantidad;
     Button bAgregar;
-    producto myProduct;
+
 }
